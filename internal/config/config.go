@@ -9,10 +9,9 @@ import (
 )
 
 type Config struct {
-	Env         string `yaml:"env" env-required:"true"`
-	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HTTPServer  `yaml:"http_server"`
-	DBServer    `yaml:"db_server"`
+	Env        string `yaml:"env" env-required:"true"`
+	HTTPServer `yaml:"http_server"`
+	DBServer   `yaml:"db_server"`
 }
 
 type HTTPServer struct {
@@ -29,6 +28,8 @@ type DBServer struct {
 	DBname   string `yaml:"dbname" env-default:"mydatabase"`
 }
 
+// MustLoad loads the configuration from the specified path and returns it.
+// It panics if the configuration cannot be loaded.
 func MustLoad() *Config {
 	configPath := os.Getenv("CONFIG_PATH") // TODO: implement flag `--path`
 

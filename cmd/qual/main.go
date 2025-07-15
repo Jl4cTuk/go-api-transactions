@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"infotex/internal/config"
 	"infotex/internal/http-server/handlers/url/getbalance"
 	"infotex/internal/http-server/handlers/url/getlast"
@@ -18,16 +17,14 @@ import (
 )
 
 const (
-	envLocal = "local"
-	envDev   = "dev"
-	envProd  = "prod"
+	envDev  = "dev"
+	envProd = "prod"
 )
 
 func main() {
 
 	// init config
 	cfg := config.MustLoad()
-	fmt.Println(cfg)
 
 	// init logger
 	log := setupLogger(cfg.Env)
@@ -54,11 +51,8 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
-	// POST /api/send
 	router.Post("/api/send", send.New(log, storage))
-	// GET /api/transactions?count=N
 	router.Get("/api/transactions", getlast.New(log, storage))
-	// GET /api/wallet/{address}/balance
 	router.Get("/api/wallet/{address}/balance", getbalance.New(log, storage))
 
 	srv := &http.Server{
@@ -81,12 +75,8 @@ func setupLogger(env string) *slog.Logger {
 	var log *slog.Logger
 
 	switch env {
-	case envLocal:
-		log = setupPrettySlog()
 	case envDev:
-		log = slog.New(
-			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),
-		)
+		log = setupPrettySlog()
 	case envProd:
 		log = slog.New(
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
@@ -95,6 +85,8 @@ func setupLogger(env string) *slog.Logger {
 	return log
 }
 
+// setupPrettySlog initializes a pretty logger for development environment.
+// For debugging purposes, it outputs logs with colors and additional context.
 func setupPrettySlog() *slog.Logger {
 	opts := slogpretty.PrettyHandlerOptions{
 		SlogOpts: &slog.HandlerOptions{
