@@ -26,40 +26,34 @@ DECLARE
     sender_exists BOOLEAN;
     receiver_exists BOOLEAN;
 BEGIN
-    -- Проверка существования кошельков
     SELECT EXISTS (SELECT 1 FROM wallets WHERE address = sender) INTO sender_exists;
     SELECT EXISTS (SELECT 1 FROM wallets WHERE address = receiver) INTO receiver_exists;
 
     IF NOT sender_exists THEN
-        RAISE EXCEPTION 'Sender wallet does not exist';
+        RAISE EXCEPTION 'Invalid wallet' USING ERRCODE = 'P0010';
     END IF;
 
     IF NOT receiver_exists THEN
-        RAISE EXCEPTION 'Receiver wallet does not exist';
+        RAISE EXCEPTION 'Invalid wallet' USING ERRCODE = 'P0010';
     END IF;
 
-    -- Блокируем строку отправителя и получаем баланс
     SELECT balance INTO sender_balance
     FROM wallets
     WHERE address = sender
     FOR UPDATE;
 
-    -- Проверка достаточности баланса
     IF sender_balance < amount THEN
-        RAISE EXCEPTION 'Insufficient funds';
+        RAISE EXCEPTION 'Insufficient funds' USING ERRCODE = 'P0011';
     END IF;
 
-    -- Списание
     UPDATE wallets 
     SET balance = balance - amount 
     WHERE address = sender;
 
-    -- Зачисление
     UPDATE wallets 
     SET balance = balance + amount 
     WHERE address = receiver;
 
-    -- Логирование
     INSERT INTO transactions (sender, receiver, amount)
     VALUES (sender, receiver, amount);
 END;

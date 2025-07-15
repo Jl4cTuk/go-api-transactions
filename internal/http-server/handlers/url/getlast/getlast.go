@@ -20,6 +20,7 @@ type LastTransactionsGetter interface {
 	GetLastTransactions(count int) ([]model.Transaction, error)
 }
 
+// getlast returns last N transactions between wallets
 func New(log *slog.Logger, lastTransactionsGetter LastTransactionsGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.getlast.New"

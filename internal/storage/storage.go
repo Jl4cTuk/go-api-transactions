@@ -3,6 +3,7 @@ package storage
 import "errors"
 
 var (
-	ErrWalletNotFound = errors.New("no rows in result set")
-	ErrURLExists      = errors.New("alias exists")
+	ErrInvalidWallet     = errors.New("wrong wallet adress")
+	ErrInsufficientFunds = errors.New("low balance")
+	ErrWalletNotFound    = errors.New("wallet not found")
 )

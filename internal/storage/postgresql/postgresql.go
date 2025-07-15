@@ -2,13 +2,16 @@ package postgresql
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"infotex/internal/config"
 	"infotex/internal/domain/model"
 	wallet "infotex/internal/lib/random"
+	"infotex/internal/storage"
 	"math/rand"
 	"time"
 
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 )
 
@@ -56,18 +59,45 @@ func (s *Storage) AddWallet(address string, balance int) (int64, error) {
 func (s *Storage) GetWalletBalance(address string) (int64, error) {
 	const op = "storage.postgresql.GetWalletBalance"
 
+	isExists, err := s.walletExists(address)
+	if err != nil {
+		return -1, fmt.Errorf("%s: %w", op, err)
+	}
+	if !isExists {
+		return -1, fmt.Errorf("%s: %w", op, storage.ErrWalletNotFound)
+	}
+
 	stmt, err := s.db.Prepare("SELECT balance FROM wallets WHERE address=$1")
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var balance int64 = 0
+	var balance int64
 	err = stmt.QueryRow(address).Scan(&balance)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return balance, nil
+}
+
+// walletExists checks does the wallet exists in database
+// Returns true or false and an error if something is wrong
+func (s *Storage) walletExists(address string) (bool, error) {
+	const op = "storage.postgresql.WalletExists"
+
+	stmt, err := s.db.Prepare("SELECT EXISTS(SELECT 1 FROM wallets WHERE address=$1)")
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	var exists bool
+	err = stmt.QueryRow(address).Scan(&exists)
+	if err != nil {
+		return false, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return exists, nil
 }
 
 // ProcessTransactions executes a stored procedure to transfer an amount from one wallet to another.
@@ -78,10 +108,18 @@ func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amoun
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
-	// TODO: check errors from stored procedure
 
 	_, err = stmt.Exec(senderAdress, receiverAdress, amount)
 	if err != nil {
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) {
+			switch pqErr.Code {
+			case "P0010":
+				return fmt.Errorf("%s: %w", op, storage.ErrInvalidWallet)
+			case "P0011":
+				return fmt.Errorf("%s: %w", op, storage.ErrInsufficientFunds)
+			}
+		}
 		return fmt.Errorf("%s: %w", op, err)
 	}
 

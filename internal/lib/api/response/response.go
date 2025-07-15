@@ -40,6 +40,16 @@ func ValidationError(errs validator.ValidationErrors) Response {
 				errMsgs,
 				fmt.Sprintf("field %s is a required field", err.Field()),
 			)
+		case "gt":
+			errMsgs = append(
+				errMsgs,
+				fmt.Sprintf("field %s must be greater than 0", err.Field()),
+			)
+		case "nefield":
+			errMsgs = append(
+				errMsgs,
+				"cant send to same wallet",
+			)
 		default:
 			errMsgs = append(
 				errMsgs,

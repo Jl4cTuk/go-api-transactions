@@ -14,7 +14,6 @@ import (
 )
 
 type Response struct {
-	resp.Response
 	Balance int64 `json:"balance,omitempty"`
 }
 
@@ -22,7 +21,7 @@ type BalanceGetter interface {
 	GetWalletBalance(address string) (int64, error)
 }
 
-// GET /api/wallet/{address}/balance
+// getbalance returns balanse of the given wallet address
 func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.getbalance.New"
@@ -43,7 +42,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 		log.Info("got address", slog.String("address", address))
 
 		balance, err := balanceGetter.GetWalletBalance(address)
-		if errors.Is(err, storage.ErrWalletNotFound) { // TODO: properly validate this
+		if errors.Is(err, storage.ErrWalletNotFound) {
 			log.Info("wallet not found", slog.String("address", address))
 
 			render.JSON(w, r, resp.Error("not found"))

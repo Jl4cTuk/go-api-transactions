@@ -1,8 +1,10 @@
 package send
 
 import (
+	"errors"
 	resp "infotex/internal/lib/api/response"
 	"infotex/internal/lib/logger/sl"
+	"infotex/internal/storage"
 	"log/slog"
 	"net/http"
 
@@ -13,8 +15,8 @@ import (
 
 type Request struct {
 	Sender  string `json:"from" validate:"required"`
-	Reciver string `json:"to" validate:"required"`
-	Amount  int    `json:"amount" validate:"required"`
+	Reciver string `json:"to" validate:"required,nefield=Sender"`
+	Amount  int    `json:"amount" validate:"required,gt=0"`
 }
 
 type Response struct {
@@ -25,6 +27,7 @@ type TransactionProcesser interface {
 	ProcessTransactions(senderAdress, receiverAdress string, amount int) error
 }
 
+// send process transaction between two adresses and given amount
 func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handlers.url.send.New"
@@ -56,14 +59,21 @@ func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.Handl
 			return
 		}
 
-		if req.Amount <= 0 || req.Sender == req.Reciver { // TODO: implement in validator
-			log.Debug("stupid user oh god")
-			render.JSON(w, r, resp.Error("check ur request"))
-			return
-		}
 		err = transactionProcesser.ProcessTransactions(req.Sender, req.Reciver, req.Amount)
 
-		if err != nil { // TODO: validate errors from db
+		if errors.Is(err, storage.ErrInvalidWallet) {
+			log.Info("wrong wallet adress", slog.String("wallet", req.Sender))
+
+			render.JSON(w, r, resp.Error("wrong wallet adress"))
+			return
+		}
+		if errors.Is(err, storage.ErrInsufficientFunds) {
+			log.Info("insufficient funds", slog.String("wallet", req.Sender))
+
+			render.JSON(w, r, resp.Error("insufficient funds"))
+			return
+		}
+		if err != nil {
 			log.Error("failed to process transaction", sl.Err(err))
 
 			render.JSON(w, r, resp.Error("failed to process transaction"))
