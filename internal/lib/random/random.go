@@ -1,4 +1,4 @@
-package walletsmaker
+package random
 
 import (
 	"database/sql"
@@ -12,6 +12,7 @@ type Storage struct {
 
 var letterRunes = []rune("1234567890abcdef")
 
+// GenAddress generates a random wallet address.
 func GenAddress(length int, r *rand.Rand) string {
 	b := make([]rune, length)
 	for i := range b {
