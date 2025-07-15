@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"infotex/internal/config"
 	"infotex/internal/domain/model"
-	walletsmaker "infotex/internal/lib/walletsMaker"
+	wallet "infotex/internal/lib/random"
 	"math/rand"
 	"time"
 
@@ -16,6 +16,8 @@ type Storage struct {
 	db *sql.DB
 }
 
+// New initializes a new PostgreSQL storage connection using the provided configuration.
+// It returns a pointer to the Storage struct or an error if the connection fails.
 func New(storagePath config.DBServer) (*Storage, error) {
 	const op = "storage.postgresql.New"
 
@@ -30,6 +32,8 @@ func New(storagePath config.DBServer) (*Storage, error) {
 	return &Storage{db: db}, nil
 }
 
+// AddWallet inserts a new wallet record into the database with the specified address and balance.
+// It returns the ID of the newly inserted wallet and an error, if any occurs during the operation.
 func (s *Storage) AddWallet(address string, balance int) (int64, error) {
 	const op = "storage.postgresql.AddWallet"
 
@@ -47,6 +51,8 @@ func (s *Storage) AddWallet(address string, balance int) (int64, error) {
 	return lastInsertId, nil
 }
 
+// GetWalletBalance retrieves the balance of a wallet identified by the given address.
+// Returns the wallet balance as int64 if found, or -1 and an error if the query fails or the address does not exist.
 func (s *Storage) GetWalletBalance(address string) (int64, error) {
 	const op = "storage.postgresql.GetWalletBalance"
 
@@ -64,6 +70,7 @@ func (s *Storage) GetWalletBalance(address string) (int64, error) {
 	return balance, nil
 }
 
+// ProcessTransactions executes a stored procedure to transfer an amount from one wallet to another.
 func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amount int) error {
 	const op = "storage.postgresql.GetWalletBalance"
 
@@ -71,6 +78,7 @@ func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amoun
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
+	// TODO: check errors from stored procedure
 
 	_, err = stmt.Exec(senderAdress, receiverAdress, amount)
 	if err != nil {
@@ -80,6 +88,8 @@ func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amoun
 	return nil
 }
 
+// GetLastTransactions retrieves the last N transactions from the database.
+// It returns a slice of Transaction models or an error if the query fails.
 func (s *Storage) GetLastTransactions(count int) ([]model.Transaction, error) {
 	const op = "storage.postgresql.GetLastTransactions"
 
@@ -100,11 +110,12 @@ func (s *Storage) GetLastTransactions(count int) ([]model.Transaction, error) {
 	return transactions, nil
 }
 
+// GenRandomWallet generates a specified number of random wallets with an initial balance of 100.
 func (s *Storage) GenRandomWallet(amont int) error {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var err error
 	for i := 0; i < amont; i++ {
-		_, err = s.AddWallet(walletsmaker.GenAddress(8, r), 100)
+		_, err = s.AddWallet(wallet.GenAddress(8, r), 100)
 		if err != nil {
 			return err
 		}
