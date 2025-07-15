@@ -30,3 +30,6 @@ psql-down:
 
 psql-enter:
 	@docker exec -it postgres_db psql -U myuser -d mydatabase
+
+docker-run:
+	@docker run --rm --network infotex_infotex -e CONFIG_PATH=/build/config/dev-docker.yml -p 8080:8080 qual:latest
