@@ -16,14 +16,6 @@ type Storage struct {
 	db *sql.DB
 }
 
-type DBServer struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBname   string
-}
-
 func New(storagePath config.DBServer) (*Storage, error) {
 	const op = "storage.postgresql.New"
 
