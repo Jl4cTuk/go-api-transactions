@@ -1,11 +1,17 @@
 GOOSE_DRIVER := postgres
 GOOSE_DBSTRING := postgres://myuser:mypassword@localhost:5432/mydatabase
 
-run:
-	@go run -C . ./cmd/qual
+CONFIG_PATH_DEV := ./config/dev.yml
+CONFIG_PATH_PROD := ./config/prod.yml
+
+run-dev:
+	@CONFIG_PATH=$(CONFIG_PATH_DEV) go run -C . ./cmd/qual
+
+run-prod:
+	@CONFIG_PATH=$(CONFIG_PATH_PROD) go run -C . ./cmd/qual
 
 build:
-	@go build -C . ./cmd/qual
+	@CONFIG_PATH=$(CONFIG_PATH) go build -C . ./cmd/qual
 
 goose-status:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) goose -dir=migrations status
