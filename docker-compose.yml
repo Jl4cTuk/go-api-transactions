@@ -8,3 +8,13 @@ services:
       POSTGRES_PASSWORD: "mypassword"
     ports:
       - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - infotex
+
+volumes:
+  pg-data:
+
+networks:
+  infotex:
