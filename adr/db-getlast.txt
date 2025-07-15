@@ -1,1 +1,0 @@
-will use trigger func to automatically update transaction table

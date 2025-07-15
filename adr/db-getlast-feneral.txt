@@ -1,8 +1,0 @@
-will use this schema:
-
-1) backend call transaction func to process
-2) trigger listening this func and executing transactions table to add note of current transaction
-
-win: atomic func working with balance of wallets + trigger automatically dumping log of this action
-
-links: https://www.postgresqltutorial.com/postgresql-plpgsql/postgresql-create-procedure/index.html
