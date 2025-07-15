@@ -1,0 +1,2 @@
+will use atomic func to increase security
+link: https://gist.github.com/anders94/b548404b63ad61e653e5e7a92b0e1175
