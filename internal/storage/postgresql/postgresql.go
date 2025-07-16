@@ -8,8 +8,6 @@ import (
 	"infotex/internal/domain/model"
 	wallet "infotex/internal/lib/random"
 	"infotex/internal/storage"
-	"math/rand"
-	"time"
 
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -150,10 +148,9 @@ func (s *Storage) GetLastTransactions(count int) ([]model.Transaction, error) {
 
 // GenRandomWallet generates a specified number of random wallets with an initial balance of 100.
 func (s *Storage) GenRandomWallet(amont int) error {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	var err error
 	for i := 0; i < amont; i++ {
-		_, err = s.AddWallet(wallet.GenAddress(8, r), 100)
+		_, err = s.AddWallet(wallet.GenAddress(8), 100)
 		if err != nil {
 			return err
 		}
