@@ -22,13 +22,17 @@ Rest api without auth. Allow to make transactions between two wallets.
 
 On Linux/Unix:
 ```
+docker compose -f docker-compose.db.yml up -d --build
+GOOSE_DRIVER=postgres GOOSE_DBSTRING=postgres://myuser:mypassword@localhost:5432/mydatabase goose -dir=migrations up
 CONFIG_PATH=./config/dev.yml go run -C . ./cmd/qual
 ```
 
 Docker
 ```
+docker compose -f docker-compose.db.yml up -d --build
+GOOSE_DRIVER=postgres GOOSE_DBSTRING=postgres://myuser:mypassword@localhost:5432/mydatabase goose -dir=migrations up
 docker build -t qual:latest .
-docker run --rm -e CONFIG_PATH=./config/dev.yml -p 8080:8080 qual:latest
+docker run --rm --network infotex_infotex -e CONFIG_PATH=./config/dev-docker.yml -p 8080:8080 qual:latest
 ```
 
 ## Routes
