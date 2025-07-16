@@ -1,6 +1,6 @@
 env: "dev"
 http_server:
-  address: "0.0.0.0:8080"
+  address: "0.0.0.0:8080" # set port while docker run
   timeout: 4s
   idle_timeout: 60s
 db_server:

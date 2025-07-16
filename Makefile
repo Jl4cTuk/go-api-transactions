@@ -3,6 +3,7 @@ GOOSE_DBSTRING := postgres://myuser:mypassword@localhost:5432/mydatabase
 
 CONFIG_PATH_DEV := ./config/dev.yml
 CONFIG_PATH_PROD := ./config/prod.yml
+CONFIG_PATH_DEV_DOCKER := ./config/dev.yml
 
 run-dev:
 	@CONFIG_PATH=$(CONFIG_PATH_DEV) go run -C . ./cmd/qual
@@ -32,4 +33,7 @@ psql-enter:
 	@docker exec -it postgres_db psql -U myuser -d mydatabase
 
 docker-run:
-	@docker run --rm --network infotex_infotex -e CONFIG_PATH=/build/config/dev-docker.yml -p 8080:8080 qual:latest
+	@docker run --rm --network infotex_infotex -e CONFIG_PATH=$(CONFIG_PATH_DEV_DOCKER) -p 8082:8080 qual:latest
+
+docker-build:
+	@docker build -t qual:latest .
