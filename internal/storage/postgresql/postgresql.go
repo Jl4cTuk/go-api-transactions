@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"infotex/internal/config"
 	"infotex/internal/domain/model"
-	wallet "infotex/internal/lib/random"
+	wallet "infotex/internal/random"
 	"infotex/internal/storage"
 
 	"github.com/lib/pq"

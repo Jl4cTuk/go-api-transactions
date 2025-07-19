@@ -2,8 +2,8 @@ package getlast
 
 import (
 	"infotex/internal/domain/model"
-	resp "infotex/internal/lib/api/response"
-	"infotex/internal/lib/logger/sl"
+	resp "infotex/internal/api/response"
+	"infotex/internal/logger/sl"
 	"log/slog"
 	"net/http"
 	"strconv"

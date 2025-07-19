@@ -5,8 +5,8 @@ import (
 	"infotex/internal/http-server/handlers/url/getbalance"
 	"infotex/internal/http-server/handlers/url/getlast"
 	"infotex/internal/http-server/handlers/url/send"
-	"infotex/internal/lib/logger/handlers/slogpretty"
-	"infotex/internal/lib/logger/sl"
+	"infotex/internal/logger/handlers/slogpretty"
+	"infotex/internal/logger/sl"
 	"infotex/internal/storage/postgresql"
 	"log/slog"
 	"net/http"
@@ -90,7 +90,7 @@ func setupLogger(env string) *slog.Logger {
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
 		)
 	}
-	
+
 	return log
 }
 
