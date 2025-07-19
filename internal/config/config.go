@@ -15,13 +15,13 @@ type Config struct {
 }
 
 type HTTPServer struct {
-	Address     string        `yaml:"address" env-default:"localhost:8080"`
+	Address     string        `yaml:"http_address" env-default:"localhost:8080"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
 
 type DBServer struct {
-	Address  string `yaml:"address" env-default:"localhost"`
+	Address  string `yaml:"db_address" env-default:"localhost"`
 	Port     int    `yaml:"port" env-default:"5432"`
 	User     string `yaml:"user" env-default:"myuser"`
 	Password string `yaml:"password" env-default:"mypassword"`

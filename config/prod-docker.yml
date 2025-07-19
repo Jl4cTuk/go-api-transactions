@@ -1,10 +1,10 @@
 env: "prod"
 http_server:
-  address: "0.0.0.0:8080"
+  http_address: "0.0.0.0:8080"
   timeout: 4s
   idle_timeout: 60s
 db_server:
-  address: "postgres"
+  db_address: "postgres"
   port: 5432
   user: "myuser"
   password: "mypassword"
