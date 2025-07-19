@@ -21,7 +21,7 @@ Rest api without auth. Allow to make transactions between two wallets.
 ## Try it out
 
 On Linux/Unix:
-```
+```bash
 # prepare database (optional)
 docker compose -f docker-compose.db.yml up -d --build
 GOOSE_DRIVER=postgres GOOSE_DBSTRING=postgres://myuser:mypassword@localhost:5432/mydatabase goose -dir=migrations up
@@ -31,7 +31,7 @@ CONFIG_PATH=./config/dev.yml go run -C . ./cmd/qual
 ```
 
 Docker
-```
+```bash
 # prepare database (optional)
 docker compose -f docker-compose.db.yml up -d --build
 GOOSE_DRIVER=postgres GOOSE_DBSTRING=postgres://myuser:mypassword@localhost:5432/mydatabase goose -dir=migrations up
@@ -47,7 +47,7 @@ docker run --rm --network infotex_infotex -e CONFIG_PATH=./config/dev-docker.yml
 Sends specified amount of money from one to another wallet
 
 **Request body:**
-```
+```json
 {
     "from": "2bc80169",
     "to": "3c229f02",
