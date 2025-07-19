@@ -14,9 +14,9 @@ import (
 )
 
 type Request struct {
-	Sender  string `json:"from" validate:"required"`
-	Reciver string `json:"to" validate:"required,nefield=Sender"`
-	Amount  float64    `json:"amount" validate:"required,gt=0"`
+	Sender  string  `json:"from" validate:"required"`
+	Reciver string  `json:"to" validate:"required,nefield=Sender"`
+	Amount  float64 `json:"amount" validate:"required,gt=0"`
 }
 
 type Response struct {
@@ -43,6 +43,7 @@ func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.Handl
 		if err != nil {
 			log.Error("failed to decode request body", sl.Err(err))
 
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("failed to decode request"))
 			return
 		}
@@ -55,6 +56,7 @@ func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.Handl
 
 			log.Error("invalid request", sl.Err(err))
 
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, resp.ValidationError(validateErr))
 			return
 		}
@@ -64,24 +66,25 @@ func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.Handl
 		if errors.Is(err, storage.ErrInvalidWallet) {
 			log.Info("wrong wallet adress", slog.String("wallet", req.Sender))
 
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("wrong wallet adress"))
 			return
 		}
 		if errors.Is(err, storage.ErrInsufficientFunds) {
 			log.Info("insufficient funds", slog.String("wallet", req.Sender))
 
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("insufficient funds"))
 			return
 		}
 		if err != nil {
 			log.Error("failed to process transaction", sl.Err(err))
 
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("failed to process transaction"))
 			return
 		}
 
-		render.JSON(w, r, Response{
-			Response: resp.OK(),
-		})
+		render.Status(r, http.StatusNoContent)
 	}
 }

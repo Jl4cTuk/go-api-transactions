@@ -35,6 +35,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 		if address == "" {
 			log.Info("missing address")
 
+			render.Status(r, http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("invalid request"))
 			return
 		}
@@ -45,6 +46,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 		if errors.Is(err, storage.ErrWalletNotFound) {
 			log.Info("wallet not found", slog.String("address", address))
 
+			render.Status(r, http.StatusConflict)
 			render.JSON(w, r, resp.Error("not found"))
 			return
 		}
@@ -52,6 +54,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 		if err != nil {
 			log.Error("failed to process address", sl.Err(err))
 
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("internal error"))
 			return
 		}

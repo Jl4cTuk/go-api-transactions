@@ -37,18 +37,17 @@ func New(log *slog.Logger, lastTransactionsGetter LastTransactionsGetter) http.H
 			count = 1
 		}
 
-		log.Info("count", slog.Int("count", count))
+		log.Debug("count", slog.Int("count", count))
 
 		transactions, err := lastTransactionsGetter.GetLastTransactions(count)
 
 		if err != nil {
 			log.Error("failed to get last transactions", sl.Err(err))
 
+			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, resp.Error("internal error"))
 			return
 		}
-
-		log.Info("success")
 
 		render.JSON(w, r, Response{
 			Transactions: transactions,

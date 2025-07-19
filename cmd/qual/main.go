@@ -55,6 +55,8 @@ func main() {
 	router.Get("/api/transactions", getlast.New(log, storage))
 	router.Get("/api/wallet/{address}/balance", getbalance.New(log, storage))
 
+	// TODO: channel with server status
+
 	srv := &http.Server{
 		Addr:         cfg.HTTPServer.Address,
 		Handler:      router,
@@ -67,6 +69,8 @@ func main() {
 	if err := srv.ListenAndServe(); err != nil {
 		log.Error("failed to start server", sl.Err(err))
 	}
+
+	// TODO: close storage
 
 	log.Error("server stopped")
 }
@@ -81,7 +85,12 @@ func setupLogger(env string) *slog.Logger {
 		log = slog.New(
 			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
 		)
+	default:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}),
+		)
 	}
+	
 	return log
 }
 
