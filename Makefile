@@ -24,10 +24,10 @@ goose-down:
 	@GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) goose -dir=migrations down
 
 psql-up:
-	@docker compose up -d --build
+	@docker compose -f docker-compose.db.yml up -d --build
 
 psql-down:
-	@docker compose down
+	@docker compose -f docker-compose.db.yml down
 
 psql-enter:
 	@docker exec -it postgres_db psql -U myuser -d mydatabase
