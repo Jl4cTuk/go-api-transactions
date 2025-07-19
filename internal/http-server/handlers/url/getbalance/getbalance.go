@@ -14,11 +14,11 @@ import (
 )
 
 type Response struct {
-	Balance int64 `json:"balance,omitempty"`
+	Balance float64 `json:"balance,omitempty"`
 }
 
 type BalanceGetter interface {
-	GetWalletBalance(address string) (int64, error)
+	GetWalletBalance(address string) (float64, error)
 }
 
 // getbalance returns balanse of the given wallet address
@@ -39,7 +39,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 			return
 		}
 
-		log.Info("got address", slog.String("address", address))
+		log.Debug("got address", slog.String("address", address))
 
 		balance, err := balanceGetter.GetWalletBalance(address)
 		if errors.Is(err, storage.ErrWalletNotFound) {
@@ -56,7 +56,7 @@ func New(log *slog.Logger, balanceGetter BalanceGetter) http.HandlerFunc {
 			return
 		}
 
-		log.Info("address found", slog.Int64("balance", balance))
+		log.Debug("address found", slog.Float64("balance", balance))
 
 		render.JSON(w, r, Response{
 			Balance: balance,

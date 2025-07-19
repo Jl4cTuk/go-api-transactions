@@ -16,7 +16,7 @@ import (
 type Request struct {
 	Sender  string `json:"from" validate:"required"`
 	Reciver string `json:"to" validate:"required,nefield=Sender"`
-	Amount  int    `json:"amount" validate:"required,gt=0"`
+	Amount  float64    `json:"amount" validate:"required,gt=0"`
 }
 
 type Response struct {
@@ -24,7 +24,7 @@ type Response struct {
 }
 
 type TransactionProcesser interface {
-	ProcessTransactions(senderAdress, receiverAdress string, amount int) error
+	ProcessTransactions(senderAdress, receiverAdress string, amount float64) error
 }
 
 // send process transaction between two adresses and given amount
@@ -79,8 +79,6 @@ func New(log *slog.Logger, transactionProcesser TransactionProcesser) http.Handl
 			render.JSON(w, r, resp.Error("failed to process transaction"))
 			return
 		}
-
-		log.Debug("successful transaction")
 
 		render.JSON(w, r, Response{
 			Response: resp.OK(),

@@ -3,7 +3,7 @@
 CREATE TABLE wallets(
     id serial PRIMARY KEY,
     address text,
-    balance int,
+    balance REAL,
     constraint balance_nonnegative CHECK (balance >= 0),
     constraint address_unique UNIQUE (address)
 );
@@ -11,18 +11,18 @@ CREATE TABLE transactions(
     id serial PRIMARY KEY,
     sender text REFERENCES wallets (address),
     receiver text REFERENCES wallets (address),
-    amount int,
+    amount REAL,
     constraint amount_nonnegative check (amount >= 0)
 );
 CREATE PROCEDURE transfer(
    sender TEXT,
    receiver TEXT, 
-   amount INT
+   amount REAL
 )
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    sender_balance INT;
+    sender_balance REAL;
     sender_exists BOOLEAN;
     receiver_exists BOOLEAN;
 BEGIN

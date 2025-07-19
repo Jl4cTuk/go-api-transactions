@@ -35,7 +35,7 @@ func New(storagePath config.DBServer) (*Storage, error) {
 
 // AddWallet inserts a new wallet record into the database with the specified address and balance.
 // It returns the ID of the newly inserted wallet and an error, if any occurs during the operation.
-func (s *Storage) AddWallet(address string, balance int) (int64, error) {
+func (s *Storage) AddWallet(address string, balance float64) (float64, error) {
 	const op = "storage.postgresql.AddWallet"
 
 	stmt, err := s.db.Prepare("INSERT INTO wallets (address, balance) VALUES ($1, $2) RETURNING id")
@@ -43,7 +43,7 @@ func (s *Storage) AddWallet(address string, balance int) (int64, error) {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var lastInsertId int64 = 0
+	var lastInsertId float64 = 0
 	err = stmt.QueryRow(address, balance).Scan(&lastInsertId)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
@@ -54,7 +54,7 @@ func (s *Storage) AddWallet(address string, balance int) (int64, error) {
 
 // GetWalletBalance retrieves the balance of a wallet identified by the given address.
 // Returns the wallet balance as int64 if found, or -1 and an error if the query fails or the address does not exist.
-func (s *Storage) GetWalletBalance(address string) (int64, error) {
+func (s *Storage) GetWalletBalance(address string) (float64, error) {
 	const op = "storage.postgresql.GetWalletBalance"
 
 	isExists, err := s.walletExists(address)
@@ -70,7 +70,7 @@ func (s *Storage) GetWalletBalance(address string) (int64, error) {
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var balance int64
+	var balance float64
 	err = stmt.QueryRow(address).Scan(&balance)
 	if err != nil {
 		return -1, fmt.Errorf("%s: %w", op, err)
@@ -99,7 +99,7 @@ func (s *Storage) walletExists(address string) (bool, error) {
 }
 
 // ProcessTransactions executes a stored procedure to transfer an amount from one wallet to another.
-func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amount int) error {
+func (s *Storage) ProcessTransactions(senderAdress, receiverAdress string, amount float64) error {
 	const op = "storage.postgresql.GetWalletBalance"
 
 	stmt, err := s.db.Prepare("CALL transfer($1, $2, $3)")
